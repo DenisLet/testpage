@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Выбор команды</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #000;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        form {
+            border: 1px solid #fff;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            max-width: 300px;
+            width: 100%;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        select, input[type="submit"], button {
+            width: calc(100% - 22px); /* Подстраиваем размер кнопки и полей ввода под форму */
+            padding: 5px;
+            margin-bottom: 10px;
+            border: 1px solid #fff;
+            border-radius: 3px;
+            box-sizing: border-box;
+            background-color: #000;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        input[type="submit"], button {
+            background-color: #007bff;
+            transition: background-color 0.3s;
+        }
+
+        input[type="submit"]:hover, button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <form id="select-form" action="/matches" method="post">
+        <h1>Выберите страну, чемпионат и команды</h1>
+        <label for="country">Страна:</label>
+        <select name="country" id="country">
+            {% for country in countries %}
+            <option value="{{ country }}">{{ country }}</option>
+            {% endfor %}
+        </select>
+        <br>
+        <label for="championship">Чемпионат:</label>
+        <select name="championship" id="championship">
+        </select>
+        <br>
+        <label for="team_home">Домашняя команда:</label>
+        <select name="team_home" id="team_home">
+        </select>
+        <br>
+        <label for="team_away">Гостевая команда:</label>
+        <select name="team_away" id="team_away">
+        </select>
+        <br>
+        <!-- Скрытые поля для сохранения значений country и championship -->
+        <input type="hidden" id="hidden_country" name="country" value="">
+        <input type="hidden" id="hidden_championship" name="championship" value="">
+        <!-- Кнопка для отправки формы -->
+        <input type="submit" value="Показать матчи" id="show-matches">
+        <button type="button" id="analysis-btn">Анализ</button> <!-- Кнопка для запуска анализа -->
+    </form>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $('#country').change(function() {
+            var country = $(this).val();
+            $('#hidden_country').val(country); // Сохраняем значение страны в скрытом поле
+            $.getJSON('/championships/' + country, function(data) {
+                var options = '<option value="">Выберите чемпионат</option>';
+                for (var i = 0; i < data.length; i++) {
+                    options += '<option value="' + data[i] + '">' + data[i] + '</option>';
+                }
+                $('#championship').html(options);
+            });
+        });
+
+        $('#championship').change(function() {
+            var championship = $(this).val();
+            $('#hidden_championship').val(championship); // Сохраняем значение чемпионата в скрытом поле
+            var country = $('#country').val();
+            $.getJSON('/teams/' + country + '/' + championship, function(data) {
+                var options_home = '<option value="">Выберите домашнюю команду</option>';
+                var options_away = '<option value="">Выберите гостевую команду</option>';
+                for (var i = 0; i < data.length; i++) {
+                    options_home += '<option value="' + data[i] + '">' + data[i] + '</option>';
+                    options_away += '<option value="' + data[i] + '">' + data[i] + '</option>';
+                }
+                $('#team_home').html(options_home);
+                $('#team_away').html(options_away);
+            });
+        });
+
+        // Обработчик нажатия на кнопку "Анализ"
+        $('#analysis-btn').click(function() {
+            var country = $('#hidden_country').val(); // Получаем сохраненное значение страны
+            var championship = $('#hidden_championship').val(); // Получаем сохраненное значение чемпионата
+            var team_home = $('#team_home').val();
+            var team_away = $('#team_away').val();
+
+            if (country && championship && team_home && team_away) {
+                // Добавляем параметр country к URL-адресу
+                var url = '/analysis?team_home=' + team_home + '&team_away=' + team_away + '&championship=' + championship + '&country=' + country;
+                window.location.href = url;
+            } else {
+                alert("Выберите все параметры перед анализом!");
+            }
+        });
+    });
+</script>
+</body>
+</html>

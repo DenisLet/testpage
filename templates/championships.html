@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Championships</title>
+</head>
+<body>
+    <h1>Championships</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Country</th>
+                <th>Gender</th>
+                <th>League</th>
+                <th>Link</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for championship in championships %}
+            <tr>
+                <td>{{ championship.id }}</td>
+                <td>{{ championship.country }}</td>
+                <td>{{ championship.gender }}</td>
+                <td>{{ championship.league }}</td>
+                <td>{{ championship.link }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

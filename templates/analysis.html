@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>H2H</title>
+    <style>
+        /* Общие стили */
+        body {
+            font-family: Courier, monospace;
+            margin: 0;
+            padding: 0;
+            background-color: #000; /* Цвет фона */
+            color: #fff; /* Цвет текста */
+        }
+
+        /* Стили для мобильных устройств */
+        @media only screen and (max-width: 600px) {
+            /* Перераспределение контейнеров */
+            .table-container {
+                flex-direction: column;
+            }
+
+            /* Выравнивание кнопок в одной строке */
+            .date-buttons-container {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 10px;
+            }
+
+            /* Уменьшение отступов таблиц */
+            table {
+                margin-bottom: 20px;
+            }
+
+            /* Стили для кнопок на мобильных устройствах */
+            input[type="submit"],
+            button {
+                background-color: #FF0000; /* Красный фон кнопок */
+                color: #000; /* Черный текст на кнопках */
+                padding: 5px 10px; /* Отступы внутри кнопок */
+                border: none; /* Убираем границу кнопок */
+                cursor: pointer; /* Изменяем курсор при наведении на кнопку */
+                margin-bottom: 10px; /* Отступ снизу */
+                width: fit-content; /* Ширина кнопок подстроится под контент */
+            }
+        }
+
+        /* Стили для кнопок на десктопных устройствах */
+        input[type="submit"],
+        button {
+            background-color: #4CAF50; /* Цвет фона кнопок */
+            color: white; /* Цвет текста на кнопках */
+            padding: 5px 10px; /* Отступы внутри кнопок */
+            border: none; /* Убираем границу кнопок */
+            cursor: pointer; /* Изменяем курсор при наведении на кнопку */
+            margin-bottom: 10px; /* Отступ снизу */
+            width: fit-content; /* Ширина кнопок подстроится под контент */
+        }
+
+        /* Стили для кнопок выбора даты */
+        button.date-buttons {
+            background-color: #FF0000; /* Красный фон кнопок выбора даты */
+            color: #000; /* Черный текст на кнопках выбора даты */
+        }
+
+        /* Стили для заголовка */
+        h1 {
+            text-align: center; /* Выравнивание текста по центру */
+            margin-bottom: 20px; /* Отступ снизу */
+        }
+
+        /* Стили для контейнера таблиц */
+        .table-container {
+            display: flex; /* Используем flexbox для расположения таблиц в строку */
+            justify-content: space-between; /* Равномерно распределяем пространство между таблицами */
+            flex-wrap: wrap; /* Разрешаем перенос элементов на новую строку при необходимости */
+        }
+
+        /* Стили для горизонтальной прокрутки таблиц */
+        .scrollable-table {
+            overflow-x: auto; /* Включаем горизонтальную прокрутку */
+        }
+    </style>
+</head>
+<body>
+    <form action="/analysis" method="POST">
+        <label for="from_date">От:</label>
+        <input type="date" id="from_date" name="from_date" value="{{ from_date }}">
+        <input type="hidden" id="team_home" name="team_home" value="{{ team_home }}">
+        <input type="hidden" id="team_away" name="team_away" value="{{ team_away }}">
+        <input type="hidden" id="championship" name="championship" value="{{ championship }}">
+        <input type="hidden" id="country" name="country" value="{{ country }}">
+        <input type="submit" value="Применить">
+    </form>
+
+    <button class="date-buttons" onclick="set2023Date()">2023-01-01</button>
+    <button class="date-buttons" onclick="set2023JulyDate()">2023-07-01</button>
+    <h1>Analysis for {{ team_home }} vs {{ team_away }}</h1>
+
+    <div class="table-container">
+    <table border="1">
+        <caption>Stats for HOME/AWAY</caption>
+        <tr>
+            <th>Team</th>
+            <th>Matches</th>
+            <th>Scored</th>
+            <th>Conceded</th>
+            <th>Total</th>
+        </tr>
+
+        <tr>
+            <td>{{ team_home }}</td>
+            <td>{{ total_matches_home }}</td>
+            <td>{{ '{:.1f}'.format(average_scores_home_scored) }}</td>
+            <td>{{ '{:.1f}'.format(average_scores_home_conceded) }}</td>
+            <td>{{ '{:.1f}'.format(average_scores_home) }}</td>
+        </tr>
+        <tr>
+            <td>{{ team_away }}</td>
+            <td>{{ total_matches_away }}</td>
+            <td>{{ '{:.1f}'.format(average_scores_away_scored) }}</td>
+            <td>{{ '{:.1f}'.format(average_scores_away_conceded) }}</td>
+            <td>{{ '{:.1f}'.format(average_scores_away) }}</td>
+        </tr>
+        <tr>
+            <td>Average</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>{{ '{:.1f}'.format((average_scores_home + average_scores_away) / 2) }}</td>
+        </tr>
+    </table>
+
+    <table border="1">
+        <caption>Summary</caption>
+        <tr>
+            <th>Team</th>
+            <th>Matches</th>
+            <th>Scored</th>
+            <th>Conceded</th>
+            <th>Total</th>
+        </tr>
+        <tr>
+            <td>{{ team_home }}</td>
+            <td>{{ team1_total_matches }}</td>
+            <td>{{ '{:.1f}'.format(team1_ind_ave_scored) }}</td>
+            <td>{{ '{:.1f}'.format(team1_ind_ave_conceded) }}</td>
+            <td>{{ '{:.1f}'.format(team1_anywhere_ave) }}</td>
+        </tr>
+        <tr>
+            <td>{{ team_away }}</td>
+            <td>{{ team2_total_matches }}</td>
+            <td>{{ '{:.1f}'.format(team2_ind_ave_scored) }}</td>
+            <td>{{ '{:.1f}'.format(team2_ind_ave_conceded) }}</td>
+            <td>{{ '{:.1f}'.format(team2_anywhere_ave) }}</td>
+        </tr>
+        <tr>
+            <td>Average</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>{{ '{:.1f}'.format((team1_anywhere_ave + team2_anywhere_ave) / 2) }}</td>
+        </tr>
+    </table>
+
+    <!-- Пустая таблица 1 -->
+    <table border="1">
+        <caption>H2H HOME/AWAY</caption>
+        <tr>
+            <th>Team</th>
+            <th>Matches</th>
+            <th>Scored</th>
+            <th>Conceded</th>
+            <th>Total</th>
+        </tr>
+        <tr>
+            <td>{{ team_home }}</td>
+            <td>{{ total_matches_home_between }}</td>
+            <td>{{ '{:.1f}'.format(average_scores_home_scored_between) }}</td>
+            <td>{{ '{:.1f}'.format(average_scores_home_conceded_between) }}</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>{{ team_away }}</td>
+            <td>{{ total_matches_home_between }}</td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Average</td>
+            <td>{{ total_matches_home_between }}</td>
+            <td></td>
+            <td></td>
+            <td>{{ '{:.1f}'.format(average_scores_between_h2h) }}</td>
+        </tr>
+    </table>
+
+    <!-- Пустая таблица 2 -->
+    <table border="1">
+        <caption>H2H Summary</caption>
+        <tr>
+            <th>Team</th>
+            <th>Matches</th>
+            <th>Scored</th>
+            <th>Conceded</th>
+            <th>Total</th>
+        </tr>
+        <tr>
+            <td>{{ team_home }}</td>
+            <td>{{ all_h2h_matches }}</td>
+            <td>{{ team1_ind_ave_scored_between }}</td>
+            <td>{{ team1_ind_ave_conceded_between }}</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>{{ team_away }}</td>
+            <td>{{ all_h2h_matches }}</td>
+            <td>{{ percentiles_df }}</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Average</td>
+            <td>{{ all_h2h_matches }}</td>
+            <td></td>
+            <td></td>
+            <td>{{ '{:.1f}'.format(team1_ind_ave_scored_between + team1_ind_ave_conceded_between) }}</td>
+        </tr>
+    </table>
+</div>
+
+<div class="scrollable-table">
+    <table border="1">
+        <caption>Percentiles</caption>
+        <tr>
+            <th>league_name</th>
+            <th>team</th>
+            <th>_0</th>
+            <th>_5</th>
+            <th>_10</th>
+            <th>_15</th>
+            <th>_20</th>
+            <th>_25</th>
+            <th>_30</th>
+            <th>_35</th>
+            <th>_40</th>
+            <th>_45</th>
+            <th>_50</th>
+            <th>_55</th>
+            <th>_60</th>
+            <th>_65</th>
+            <th>_70</th>
+            <th>_75</th>
+            <th>_80</th>
+            <th>_85</th>
+            <th>_90</th>
+            <th>_95</th>
+            <th>_100</th>
+        </tr>
+        {% for index, row in percentiles_df1.round(1).iterrows() %}
+        <tr>
+            <td>{{ row['league_name'] }}</td>
+            <td>{{ row['team'] }}</td>
+            <td>{{ row['_0'] }}</td>
+            <td>{{ row['_5'] }}</td>
+            <td>{{ row['_10'] }}</td>
+            <td>{{ row['_15'] }}</td>
+            <td>{{ row['_20'] }}</td>
+            <td>{{ row['_25'] }}</td>
+            <td>{{ row['_30'] }}</td>
+            <td>{{ row['_35'] }}</td>
+            <td>{{ row['_40'] }}</td>
+            <td>{{ row['_45'] }}</td>
+            <td>{{ row['_50'] }}</td>
+            <td>{{ row['_55'] }}</td>
+            <td>{{ row['_60'] }}</td>
+            <td>{{ row['_65'] }}</td>
+            <td>{{ row['_70'] }}</td>
+            <td>{{ row['_75'] }}</td>
+            <td>{{ row['_80'] }}</td>
+            <td>{{ row['_85'] }}</td>
+            <td>{{ row['_90'] }}</td>
+            <td>{{ row['_95'] }}</td>
+            <td>{{ row['_100'] }}</td>
+        </tr>
+        {% endfor %}
+        {% for index, row in percentiles_df2.round(1).iterrows() %}
+        <tr>
+            <td>{{ row['league_name'] }}</td>
+            <td>{{ row['team'] }}</td>
+            <td>{{ row['_0'] }}</td>
+            <td>{{ row['_5'] }}</td>
+            <td>{{ row['_10'] }}</td>
+            <td>{{ row['_15'] }}</td>
+            <td>{{ row['_20'] }}</td>
+            <td>{{ row['_25'] }}</td>
+            <td>{{ row['_30'] }}</td>
+            <td>{{ row['_35'] }}</td>
+            <td>{{ row['_40'] }}</td>
+            <td>{{ row['_45'] }}</td>
+            <td>{{ row['_50'] }}</td>
+            <td>{{ row['_55'] }}</td>
+            <td>{{ row['_60'] }}</td>
+            <td>{{ row['_65'] }}</td>
+            <td>{{ row['_70'] }}</td>
+            <td>{{ row['_75'] }}</td>
+            <td>{{ row['_80'] }}</td>
+            <td>{{ row['_85'] }}</td>
+            <td>{{ row['_90'] }}</td>
+            <td>{{ row['_95'] }}</td>
+            <td>{{ row['_100'] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+<script>
+    function set2023Date() {
+        document.getElementById("from_date").value = '2023-01-01';
+    }
+</script>
+
+<!-- Скрипт для установки даты 2023-07-01 -->
+<script>
+    function set2023JulyDate() {
+        document.getElementById("from_date").value = '2023-07-01';
+    }
+</script>
+</body>
+</html>

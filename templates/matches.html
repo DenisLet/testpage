@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Матчи команды</title>
+</head>
+<body>
+<form action="/matches" method="POST">
+    <label for="from_date">От:</label>
+    <input type="date" id="from_date" name="from_date">
+    <input type="hidden" id="team_home" name="team_home" value="{{ team_home }}">
+    <input type="hidden" id="team_away" name="team_away" value="{{ team_away }}">
+    <input type="hidden" id="championship" name="championship" value="{{ championship }}">
+    <input type="hidden" id="country" name="country" value="{{ country }}">
+    <input type="submit" value="Применить">
+</form>
+    <h1>Матчи выбранных команд: {{ team_home }} vs {{ team_away }}</h1>
+
+    <h2>{{ team_home }}</h2>
+    <table border="1">
+        <tr>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Home</th>
+            <th>Away</th>
+            <th>Stage</th>
+            <th>Home OT</th>
+            <th>Away OT</th>
+            <th>Home FT</th>
+            <th>Away FT</th>
+            <th>Scored FT</th>
+            <th>Home Q1</th>
+            <th>Away Q1</th>
+            <th>Home Q2</th>
+            <th>Away Q2</th>
+            <th>Home Q3</th>
+            <th>Away Q3</th>
+            <th>Home Q4</th>
+            <th>Away Q4</th>
+            <th>Home OT</th>
+            <th>Away OT</th>
+            <th>WIN 1</th>
+            <th>WIN 2</th>
+            <th>TOTAL</th>
+            <th>HC</th>
+            <th>HC q1</th>
+        </tr>
+
+        {% for match in matches_home %}
+        <tr>
+            <td>{{ match.match_date }}</td>
+            <td>{{ match.start_time }}</td>
+            <td>{{ match.team_home }}</td>
+            <td>{{ match.team_away }}</td>
+            <td>{{ match.stage }}</td>
+            <td>{{ match.home_score }}</td>
+            <td>{{ match.away_score }}</td>
+            <td>{{ match.home_score_ft }}</td>
+            <td>{{ match.away_score_ft }}</td>
+            <td>{{ match.total_ft }}</td>
+            {% for detail in match.details %}
+            <td>{{ detail.home_q1 }}</td>
+            <td>{{ detail.away_q1 }}</td>
+            <td>{{ detail.home_q2 }}</td>
+            <td>{{ detail.away_q2 }}</td>
+            <td>{{ detail.home_q3 }}</td>
+            <td>{{ detail.away_q3 }}</td>
+            <td>{{ detail.home_q4 }}</td>
+            <td>{{ detail.away_q4 }}</td>
+            <td>{{ detail.home_ot }}</td>
+            <td>{{ detail.away_ot }}</td>
+            <td>{{ detail.home_win }}</td>
+            <td>{{ detail.away_win }}</td>
+            <td>{{ detail.total }}</td>
+            <td>{{ detail.handicap }}</td>
+            <td>{{ detail.hc_q1 }}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h2>{{ team_away }}</h2>
+    <table border="1">
+        <tr>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Home</th>
+            <th>Away</th>
+            <th>Stage</th>
+            <th>Home OT</th>
+            <th>Away OT</th>
+            <th>Home FT</th>
+            <th>Away FT</th>
+            <th>Scored FT</th>
+            <th>Home Q1</th>
+            <th>Away Q1</th>
+            <th>Home Q2</th>
+            <th>Away Q2</th>
+            <th>Home Q3</th>
+            <th>Away Q3</th>
+            <th>Home Q4</th>
+            <th>Away Q4</th>
+            <th>Home OT</th>
+            <th>Away OT</th>
+            <th>WIN 1</th>
+            <th>WIN 2</th>
+            <th>TOTAL</th>
+            <th>HC</th>
+            <th>HC q1</th>
+        </tr>
+
+        {% for match in matches_away %}
+        <tr>
+            <td>{{ match.match_date }}</td>
+            <td>{{ match.start_time }}</td>
+            <td>{{ match.team_home }}</td>
+            <td>{{ match.team_away }}</td>
+            <td>{{ match.stage }}</td>
+            <td>{{ match.home_score }}</td>
+            <td>{{ match.away_score }}</td>
+            <td>{{ match.home_score_ft }}</td>
+            <td>{{ match.away_score_ft }}</td>
+            <td>{{ match.total_ft }}</td>
+            {% for detail in match.details %}
+            <td>{{ detail.home_q1 }}</td>
+            <td>{{ detail.away_q1 }}</td>
+            <td>{{ detail.home_q2 }}</td>
+            <td>{{ detail.away_q2 }}</td>
+            <td>{{ detail.home_q3 }}</td>
+            <td>{{ detail.away_q3 }}</td>
+            <td>{{ detail.home_q4 }}</td>
+            <td>{{ detail.away_q4 }}</td>
+            <td>{{ detail.home_ot }}</td>
+            <td>{{ detail.away_ot }}</td>
+            <td>{{ detail.home_win }}</td>
+            <td>{{ detail.away_win }}</td>
+            <td>{{ detail.total }}</td>
+            <td>{{ detail.handicap }}</td>
+            <td>{{ detail.hc_q1 }}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h2>Matches Between {{ team_home }} and {{ team_away }}</h2>
+    <table border="1">
+        <tr>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Home</th>
+            <th>Away</th>
+            <th>Stage</th>
+            <th>Home OT</th>
+            <th>Away OT</th>
+            <th>Home FT</th>
+            <th>Away FT</th>
+            <th>Scored FT</th>
+            <th>Home Q1</th>
+            <th>Away Q1</th>
+            <th>Home Q2</th>
+            <th>Away Q2</th>
+            <th>Home Q3</th>
+            <th>Away Q3</th>
+            <th>Home Q4</th>
+            <th>Away Q4</th>
+            <th>Home OT</th>
+            <th>Away OT</th>
+            <th>WIN 1</th>
+            <th>WIN 2</th>
+            <th>TOTAL</th>
+            <th>HC</th>
+            <th>HC q1</th>
+        </tr>
+
+        {% for match in matches_between %}
+        <tr>
+            <td>{{ match.match_date }}</td>
+            <td>{{ match.start_time }}</td>
+            <td>{{ match.team_home }}</td>
+            <td>{{ match.team_away }}</td>
+            <td>{{ match.stage }}</td>
+            <td>{{ match.home_score }}</td>
+            <td>{{ match.away_score }}</td>
+            <td>{{ match.home_score_ft }}</td>
+            <td>{{ match.away_score_ft }}</td>
+            <td>{{ match.total_ft }}</td>
+            {% for detail in match.details %}
+            <td>{{ detail.home_q1 }}</td>
+            <td>{{ detail.away_q1 }}</td>
+            <td>{{ detail.home_q2 }}</td>
+            <td>{{ detail.away_q2 }}</td>
+            <td>{{ detail.home_q3 }}</td>
+            <td>{{ detail.away_q3 }}</td>
+            <td>{{ detail.home_q4 }}</td>
+            <td>{{ detail.away_q4 }}</td>
+            <td>{{ detail.home_ot }}</td>
+            <td>{{ detail.away_ot }}</td>
+            <td>{{ detail.home_win }}</td>
+            <td>{{ detail.away_win }}</td>
+            <td>{{ detail.total }}</td>
+            <td>{{ detail.handicap }}</td>
+            <td>{{ detail.hc_q1 }}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
